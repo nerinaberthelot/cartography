@@ -58,7 +58,7 @@ export function buildDOM(container, words, cfg) {
     });
   });
 
-  return { nodeMap, lineEls };
+  return { nodeMap, lineEls, noiseEl, svg };
 }
 
 /* ─── Update SVG lines ───────────────────── */

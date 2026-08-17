@@ -10,7 +10,7 @@ export function createCartography({ container, config } = {}) {
   loadLayout();
   initState(container);
 
-  const { nodeMap, lineEls } = buildDOM(container, WORDS, cfg);
+  const { nodeMap, lineEls, noiseEl, svg } = buildDOM(container, WORDS, cfg);
   initInteraction(nodeMap, WORDS, cfg, container);
   startAnimation(nodeMap, lineEls, WORDS, cfg, container);
 
@@ -23,6 +23,9 @@ export function createCartography({ container, config } = {}) {
       stopAnimation();
       destroyInteraction();
       destroyState();
+      nodeMap.forEach(entry => entry.wrapper.remove());
+      if (noiseEl) noiseEl.remove();
+      if (svg) svg.remove();
     },
   };
 }
