@@ -1,0 +1,139 @@
+/* ─── Container ──────────────────────────── */
+
+.cartography {
+  --bg: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-tertiary: #8a8a8a;
+  --line-idle: #aaaaaa;
+  --font-body: 'Inter', sans-serif;
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Noise overlay ───────────────────────── */
+
+.cartography .noise-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.06;
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  image-rendering: auto;
+}
+
+/* ─── SVG connections ─────────────────────── */
+
+.cartography #connections {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.cartography #connections line {
+  stroke: var(--line-idle);
+  stroke-linecap: round;
+  transition: opacity 0.6s ease;
+}
+
+/* ─── Node wrapper (positioning + float) ─── */
+
+.cartography .node-wrapper {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%) translate(var(--dx, 0px), var(--dy, 0px));
+  z-index: 1;
+  will-change: transform;
+  cursor: grab;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.cartography .node-wrapper.dragging {
+  cursor: grabbing;
+  z-index: 10;
+}
+
+/* ─── Node base ────────────────────────────── */
+
+.cartography .node {
+  display: block;
+  font-family: var(--font-body);
+  line-height: 1.2;
+  transition: opacity 0.5s ease, color 0.5s ease;
+  pointer-events: none;
+}
+
+/* ─── Editor controls ───────────────────────── */
+
+.cartography .editor-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 24px;
+  z-index: 2;
+  display: flex;
+  gap: 14px;
+  pointer-events: none;
+}
+
+.cartography .editor-controls button {
+  font: 200 11px/1 'Inter', sans-serif;
+  color: var(--line-idle);
+  background: none;
+  border: none;
+  opacity: 0.6;
+  cursor: pointer;
+  letter-spacing: 0.8px;
+  padding: 0;
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
+}
+
+.cartography .editor-controls button:hover {
+  opacity: 1;
+}
+
+.cartography .editor-controls button:active {
+  opacity: 0.7;
+}
+
+/* ─── Tagline ──────────────────────────────── */
+
+.cartography .tagline {
+  position: absolute;
+  bottom: 20px;
+  right: 24px;
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-body);
+  font-weight: 200;
+  font-size: 10px;
+  color: var(--line-idle);
+  opacity: 0.25;
+  letter-spacing: 0.6px;
+}
+
+/* ─── Responsive ──────────────────────────── */
+
+@media (max-width: 768px) {
+  .cartography .tagline {
+    display: none;
+  }
+}
