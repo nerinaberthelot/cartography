@@ -36,23 +36,27 @@ avoid excessive visual effects, noisy motion, or futuristic aesthetics.
 
 | | |
 |---|---|
-| **Stack** | Vite + vanilla JS (no frameworks) |
+| **Stack** | Vite + vanilla JS (no frameworks) — importable library (`cartography`) |
 | **Font** | Inter (200–700) via Google Fonts |
-| **Entry** | `index.html` → `src/main.js` |
-| **Styles** | `src/style.css` — CSS custom properties |
-| **Noise** | Canvas 2D Value Noise (256×256), soft-light blend |
+| **Library API** | `createCartography({ container, config? })` → `{ nodeMap, lineEls, words, config, destroy }` |
+| **Entry (demo)** | `demo/index.html` → `demo/main.js` (vite root: `demo/`) |
+| **Styles** | `src/style.css` — exported as `cartography/style.css` |
+| **Noise** | Canvas 2D Value Noise (256×256), multiply blend, opacity 0.06 |
 | **Render** | `requestAnimationFrame` loop |
-| **Data** | `WORDS[]` (15 nodes), `CONNECTIONS[]` (45 edges) |
+| **Data** | `WORDS[]` (15 nodes, 6 positions each), `CONNECTIONS[]` (45 edges) |
 
 ### Modules
 
 | Module | Responsibility |
 |--------|---------------|
-| `data.js` | Conceptual Model — WORDS, CONNECTIONS, node connections, noise generation |
-| `state.js` | Navigation Model — activeState, getTargetPos, toggleState |
+| `index.js` | Library entry — createCartography(), destroy(), re-exports |
+| `config.js` | Defaults — anchor, drag physics, typography, opacity, edges |
+| `data/nodes.js` | Conceptual Model — WORDS, positions, noise, float params, loadLayout |
+| `data/edges.js` | CONNECTIONS, adjacency list, connection strength |
+| `data/stateNodes.js` | STATE_NODES (5 perspectives) |
+| `state.js` | Navigation Model — activeState, getTargetPos, resize handling |
 | `visual.js` | Visual Model — DOM construction, animation loop, edges, opacity |
-| `interaction.js` | Drag + Hover — physics, events, border resistance |
-| `main.js` | Orchestrator — init sequence, wires modules together |
+| `interaction.js` | Drag + Hover + state clicks |
 
 ### Commands
 ```bash

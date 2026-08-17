@@ -164,35 +164,14 @@ Not produced:
 - Click on System returns to neutral.
 - Click outside any node (in edit mode off) returns to neutral.
 
-### Design Editor
+### Layout Persistence
 
-A spatial configuration tool integrated into the Navigation Model.
+The design editor (edit / save / reset buttons) was removed. Only layout loading remains.
 
-**Status: disabled.** Code is commented out. Drag, save, and reset are inactive.
-
-**Capabilities (when re-enabled):**
-
-- Drag any node to reposition it (Pointer Events).
-- Click vs drag distinction: 4px movement threshold.
-- Save current layout to localStorage.
-- Load saved layout on startup with smooth transition from default positions.
-- Reset to default positions.
-- Toggle edit mode on/off.
-
-**Behavior:**
-
-- Drag modifies the position property of the active state (`pos`, `posAr`, `posArc`, etc.).
-- All 6 position states are saved and restored independently.
-- Editor controls are minimal: three text buttons (edit, save, reset) in the bottom-left corner.
-- When `editing` is true, click-outside-to-clear is disabled.
-
-**Controls:**
-
-| Button | Action |
-|--------|--------|
-| `edit: on/off` | Toggle edit mode |
-| `save` | Persist current layout to localStorage |
-| `reset` | Restore default positions, clear localStorage |
+- On boot, `loadLayout()` reads the `concept_layout` key from `localStorage`.
+- If present, it overwrites each node's six position properties (`pos`, `posAr`, `posArc`, `posExp`, `posInf`, `posAcc`) with the saved values.
+- There is currently no UI or API to write layouts back to storage.
+- The editor control CSS (`.editor-controls`) still exists in `style.css` but is never instantiated.
 
 ### Drag Interaction Model
 
@@ -237,7 +216,9 @@ Resting
 | `FRICTION` | 0.94 | Velocity decay during floating |
 | `RETURN_ACCEL` | 0.03 | Spring acceleration toward origin |
 | `RETURN_DAMPING` | 0.065 | Velocity damping during return |
+| `RETURN_SNAP` | 0.15 | Offset threshold that snaps the node back to rest |
 | `FLOAT_AMPLITUDE` | 2.0 | Oscillation amplitude during floating |
+| `FLOAT_SPEED` | 0.4 | Frequency of the drift oscillation while floating |
 | `IMPULSE_FACTOR` | 0.3 | Velocity multiplier on release |
 | `BORDER_ZONE` | 0.15 | 15% viewport margin for border resistance |
 | `MAX_VELOCITY_PCT` | 0.04 | Max release velocity as % of viewport |
@@ -462,6 +443,8 @@ The project is in an exploratory phase. The main objective is defining a coheren
 
 **First version of the conceptual network is complete.** The full cartography with 15 nodes, 45 connections, 6 perspective states, drag interaction, border resistance, and spring-based return physics is functional and documented.
 
+The project was refactored into an importable library (`cartography`): `createCartography({ container, config })` with a `destroy()` method, split into `config.js`, `data/`, `state.js`, `interaction.js`, and `visual.js`. It is integrated as an atmospheric hero layer in the portfolio web app.
+
 Current focus:
 
 - movement language
@@ -560,24 +543,34 @@ The portfolio communicates:
 
 | | |
 |---|---|
-| **Stack** | Vite + vanilla JS (no frameworks) |
+| **Stack** | Vite + vanilla JS (no frameworks) — importable library (`cartography`) |
 | **Font** | Inter (200–700) via Google Fonts |
-| **Entry** | `index.html` → `src/main.js` |
-| **Styles** | `src/style.css` — CSS custom properties |
-| **Noise** | Canvas 2D Value Noise (256×256), soft-light blend |
+| **Library API** | `createCartography({ container, config? })` → `{ nodeMap, lineEls, words, config, destroy }` |
+| **Exports** | `defaults`, `WORDS`, `CONNECTIONS`, `STATE_NODES` |
+| **Styles** | `src/style.css` — exported as `cartography/style.css` |
+| **Noise** | Canvas 2D Value Noise (256×256), multiply blend, opacity 0.06 |
 | **Render** | `requestAnimationFrame` loop |
-| **Data** | `WORDS[]` (15 nodes), `CONNECTIONS[]` (45 edges) |
+| **Data** | `WORDS[]` (15 nodes, 6 positions each), `CONNECTIONS[]` (45 edges) |
 
 ### File Structure
 
 ```
 src/
-├── main.js           — orchestrator (init sequence)
-├── data.js           — Conceptual Model (WORDS, CONNECTIONS, node connections, noise)
-├── state.js          — Navigation Model (activeState, getTargetPos, toggleState)
-├── visual.js         — Visual Model (DOM build, animation loop, edges, opacity)
-├── interaction.js    — Drag + Hover (physics, events, border resistance)
-└── style.css         — styles
+├── index.js           — library entry: createCartography() + exports
+├── config.js          — defaults (anchor, drag physics, typography, opacity, edges)
+├── data/
+│   ├── index.js       — data barrel
+│   ├── nodes.js       — WORDS (15 nodes × 6 positions), noise, float params, loadLayout
+│   ├── edges.js       — CONNECTIONS (45 edges), adjacency list, connection strength
+│   └── stateNodes.js  — STATE_NODES (5 perspectives)
+├── state.js           — Navigation Model (activeState, getTargetPos, resize handling)
+├── interaction.js     — Drag + Hover + state clicks
+├── visual.js          — Visual Model (DOM build, animation loop, edges, opacity)
+└── style.css          — styles (exported as cartography/style.css)
+
+demo/
+├── index.html         — dev entry (vite root: demo/)
+└── main.js            — boots createCartography
 ```
 
 ### Commands
